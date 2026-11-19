@@ -1,0 +1,31 @@
+name: CI
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Fixtures
+        run: pip install pillow && python3 scripts/make_fixtures.py test/fixtures
+      - name: Unit tests
+        run: npm test
+      - name: Browser tests
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+          CHROME=$(python -c "from playwright.sync_api import sync_playwright as s; p=s().start(); print(p.chromium.executable_path); p.stop()")
+          python3 test/browser/run_render.py "$CHROME"
+          python3 test/browser/run_web.py "$CHROME"
+          python3 test/browser/run_extension.py "$CHROME"
+      - name: Package
+        run: sh scripts/package.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stickstack-extension
+          path: dist/*.zip

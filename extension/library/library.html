@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>StickStack · Sticker library</title>
+    <link rel="icon" href="../icons/icon32.png" />
+    <link rel="stylesheet" href="library.css" />
+    <script type="module" src="library.js"></script>
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand">
+        <img src="../icons/icon48.png" width="32" height="32" alt="" />
+        <div><b>StickStack</b><span>Stickers for Substack Notes</span></div>
+      </div>
+      <input id="search" type="search" placeholder="Search stickers and packs" autocomplete="off" aria-label="Search" />
+      <div class="actions">
+        <button id="btn-import" class="primary">＋ Import</button>
+        <button id="btn-settings" title="Settings" aria-label="Settings">⚙︎</button>
+        <div class="menu-wrap">
+          <button id="btn-more" title="More" aria-label="More" aria-haspopup="menu">⋯</button>
+          <div class="menu" id="more-menu" role="menu" hidden>
+            <button role="menuitem" data-act="backup">Export backup (.zip)</button>
+            <button role="menuitem" data-act="restore">Restore backup…</button>
+            <button role="menuitem" data-act="converter">Open web converter</button>
+            <button role="menuitem" data-act="shortcuts">Change keyboard shortcut</button>
+            <hr />
+            <button role="menuitem" data-act="wipe" class="danger">Delete everything…</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="side">
+        <nav id="views">
+          <button data-view="all" class="view sel">All stickers <span class="n" id="n-all">0</span></button>
+          <button data-view="fav" class="view">★ Favourites <span class="n" id="n-fav">0</span></button>
+          <button data-view="recent" class="view">🕘 Recently used <span class="n" id="n-recent">0</span></button>
+        </nav>
+        <div class="side-head"><span>Packs</span><button id="btn-newpack" title="New pack" aria-label="New pack">＋</button></div>
+        <nav id="packs"></nav>
+        <div class="side-foot">
+          <a id="coffee" target="_blank" rel="noopener">☕ Buy me a coffee</a>
+          <a id="repo" target="_blank" rel="noopener">Open source on GitHub</a>
+          <small>Not affiliated with Substack, WhatsApp or Meta.</small>
+        </div>
+      </aside>
+
+      <main>
+        <div id="welcome" class="welcome" hidden>
+          <div>
+            <h1>Welcome to StickStack 👋</h1>
+            <p>Three steps: <b>import</b> your WhatsApp stickers → open <b>Substack</b> → click the sticker button in any Note or reply.</p>
+          </div>
+          <button class="primary" id="welcome-import">Import my stickers</button>
+          <button class="ghost" id="welcome-close" aria-label="Dismiss">✕</button>
+        </div>
+
+        <div class="bar">
+          <div>
+            <h2 id="view-title">All stickers</h2>
+            <span id="view-count" class="muted"></span>
+          </div>
+          <div class="bar-right">
+            <select id="sort" aria-label="Sort">
+              <option value="new">Newest first</option>
+              <option value="old">Oldest first</option>
+              <option value="name">Name</option>
+              <option value="used">Most used</option>
+            </select>
+            <button id="btn-selectall" class="ghost">Select all</button>
+          </div>
+        </div>
+
+        <div id="selbar" class="selbar" hidden>
+          <b id="sel-count">0 selected</b>
+          <select id="sel-move" aria-label="Move to pack"><option value="">Move to pack…</option></select>
+          <button data-sel="fav">★ Favourite</button>
+          <button data-sel="unfav">☆ Unfavourite</button>
+          <button data-sel="rename" id="sel-rename">Rename</button>
+          <button data-sel="download">⬇ Download</button>
+          <button data-sel="delete" class="danger">Delete</button>
+          <button data-sel="clear" class="ghost">Clear</button>
+        </div>
+
+        <div id="grid" class="grid" aria-label="Stickers"></div>
+        <div id="empty" class="empty" hidden></div>
+      </main>
+    </div>
+
+    <!-- Import -->
+    <dialog id="dlg-import" class="dlg wide">
+      <form method="dialog" class="dlg-head"><h3>Import stickers</h3><button class="ghost" aria-label="Close">✕</button></form>
+      <div class="import-body">
+        <div id="drop" class="drop" tabindex="0">
+          <div class="drop-icon">📥</div>
+          <b>Drop sticker files, folders, .zip or .wastickers here</b>
+          <span class="muted">WebP · PNG · GIF · JPEG · AVIF — or a whole “WhatsApp Stickers” folder</span>
+          <div class="drop-btns">
+            <button type="button" class="primary" id="pick-files">Choose files</button>
+            <button type="button" id="pick-folder">Choose folder</button>
+          </div>
+          <input type="file" id="in-files" multiple accept=".webp,.png,.gif,.jpg,.jpeg,.avif,.bmp,.zip,.wastickers,image/*,application/zip" hidden />
+          <input type="file" id="in-folder" webkitdirectory multiple hidden />
+        </div>
+        <label class="target">Put stickers in
+          <select id="target-pack"><option value="">Automatic (by pack / folder)</option></select>
+        </label>
+        <div id="progress" class="progress" hidden>
+          <div class="pbar"><i id="pbar"></i></div>
+          <span id="ptext" class="muted"></span>
+          <button type="button" id="pcancel" class="ghost">Cancel</button>
+        </div>
+        <div id="result" class="result" hidden></div>
+
+        <div class="guides">
+          <div class="gtabs" role="tablist">
+            <button type="button" class="gtab sel" data-g="android">Android phone</button>
+            <button type="button" class="gtab" data-g="web">WhatsApp Web (any phone, incl. iPhone)</button>
+            <button type="button" class="gtab" data-g="packs">Sticker packs</button>
+          </div>
+          <div class="guide" data-g="android">
+            <ol>
+              <li>Open the <b>Files</b> app on your phone and go to<br /><code>Internal storage › Android › media › com.whatsapp › WhatsApp › Media › WhatsApp Stickers</code></li>
+              <li>Select all stickers (or the whole folder) and <b>share/upload</b> them to your computer — Google Drive, Nearby Share, email to yourself, or USB cable.</li>
+              <li>Drop the files (or the zip, or the folder) above. Duplicates are skipped automatically.</li>
+            </ol>
+            <p class="muted">Older phones keep the folder at <code>Internal storage › WhatsApp › Media › WhatsApp Stickers</code>.</p>
+          </div>
+          <div class="guide" data-g="web" hidden>
+            <ol>
+              <li>Open <a href="https://web.whatsapp.com" target="_blank" rel="noopener">web.whatsapp.com</a> in this browser and link your phone.</li>
+              <li>Click the <b>StickStack</b> icon in the toolbar → <b>Start collecting</b>.</li>
+              <li>Open the emoji panel → <b>Stickers</b> and scroll through your favourites and packs (or open a chat full of stickers). They appear in the StickStack panel as WhatsApp loads them.</li>
+              <li>Untick anything you don’t want and press <b>Save</b>.</li>
+            </ol>
+            <p class="muted">The collector only reads images already on your screen — it never sends, clicks or changes anything in WhatsApp. WhatsApp’s built-in animated (Lottie) stickers can’t be collected.</p>
+          </div>
+          <div class="guide" data-g="packs" hidden>
+            <p><b>.wastickers</b> files from sticker-maker apps import as a pack with their title. Plain <b>.zip</b> files work too — folders inside become packs.</p>
+            <p>Telegram <b>static</b> stickers (.webp) import fine. Telegram animated (.tgs) and video (.webm) stickers aren’t supported yet.</p>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Settings -->
+    <dialog id="dlg-settings" class="dlg wide">
+      <form method="dialog" class="dlg-head"><h3>Settings</h3><button class="ghost" aria-label="Close">✕</button></form>
+      <div class="settings">
+        <div class="fields">
+          <label>Sticker size
+            <select name="size">
+              <option value="256">Small — 256 px</option>
+              <option value="384">Medium — 384 px</option>
+              <option value="512">Large — 512 px (WhatsApp original)</option>
+              <option value="768">Extra large — 768 px</option>
+            </select>
+          </label>
+          <label>Empty margin <span class="muted" id="pad-val"></span>
+            <input type="range" name="padding" min="0" max="0.3" step="0.05" />
+          </label>
+          <label>Background
+            <select name="background">
+              <option value="transparent">Transparent (recommended)</option>
+              <option value="white">White</option>
+              <option value="black">Black</option>
+              <option value="custom">Custom colour</option>
+            </select>
+          </label>
+          <label class="custom-bg">Custom colour <input type="color" name="customBg" /></label>
+          <label>Animated stickers
+            <select name="animatedFormat">
+              <option value="gif">Convert to GIF (animates on Substack)</option>
+              <option value="webp">Keep original WebP (smallest, may not animate)</option>
+              <option value="static">Still image (first frame)</option>
+            </select>
+          </label>
+          <label>GIF edge colour <span class="muted">— GIFs can’t do soft edges; pick the colour behind your stickers</span>
+            <input type="color" name="gifMatte" />
+          </label>
+          <label>Max GIF size
+            <select name="gifMaxMB">
+              <option value="2">2 MB</option>
+              <option value="4">4 MB</option>
+              <option value="8">8 MB</option>
+              <option value="15">15 MB</option>
+            </select>
+          </label>
+          <label class="check"><input type="checkbox" name="showButton" /> Show the sticker button in Substack editors</label>
+          <label class="check"><input type="checkbox" name="closeOnInsert" /> Close the picker after adding a sticker</label>
+          <p class="muted" id="storage"></p>
+        </div>
+        <div class="preview">
+          <div class="pv-box light"><img id="pv-img" alt="Preview" /></div>
+          <div class="pv-box dark"><img id="pv-img2" alt="Preview on dark background" /></div>
+          <span class="muted" id="pv-info">Preview uses your first sticker</span>
+        </div>
+      </div>
+      <div class="dlg-foot"><button id="settings-reset" class="ghost">Reset to defaults</button><button id="settings-save" class="primary">Save</button></div>
+    </dialog>
+
+    <!-- Generic prompt/confirm -->
+    <dialog id="dlg-ask" class="dlg">
+      <form method="dialog">
+        <div class="dlg-head"><h3 id="ask-title"></h3></div>
+        <p id="ask-text"></p>
+        <input id="ask-input" type="text" maxlength="60" hidden />
+        <label id="ask-check-wrap" class="check" hidden><input type="checkbox" id="ask-check" /> <span id="ask-check-label"></span></label>
+        <div class="dlg-foot">
+          <button value="cancel" class="ghost">Cancel</button>
+          <button value="ok" id="ask-ok" class="primary">OK</button>
+        </div>
+      </form>
+    </dialog>
+
+    <input type="file" id="in-restore" accept=".zip,application/zip" hidden />
+    <div id="toasts" class="toasts" aria-live="polite"></div>
+    <div id="dropcover" class="dropcover" hidden><div>Drop to import</div></div>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+<!doctype html><meta charset="utf-8"><title>render harness</title>
+<script type="module">
+import { renderSticker, makeThumb, capabilities } from '../../extension/lib/render.js';
+import { imageInfo } from '../../extension/lib/sniff.js';
+import { bytesToBase64 } from '../../extension/lib/util.js';
+window.runRender = async (name, settings) => {
+  const bytes = new Uint8Array(await (await fetch('../fixtures/' + name)).arrayBuffer());
+  const info = imageInfo(bytes);
+  const t0 = performance.now();
+  try {
+    const out = await renderSticker(bytes, info.mime, info, settings || {});
+    const thumb = await makeThumb(bytes, info.mime);
+    const u8 = new Uint8Array(await out.blob.arrayBuffer());
+    return { ok: true, ms: Math.round(performance.now() - t0), mime: out.mime, w: out.width, h: out.height, frames: out.frames, degraded: out.degraded || '', thumbType: thumb.blob.type, b64: bytesToBase64(u8) };
+  } catch (e) { return { ok: false, error: e.userMessage || String(e) }; }
+};
+window.caps = capabilities();
+window.ready = true;
+</script>

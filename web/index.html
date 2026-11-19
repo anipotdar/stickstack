@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>StickStack Converter — WhatsApp stickers to PNG & GIF</title>
+    <meta name="description" content="Free, private converter: turn WhatsApp stickers (.webp, .wastickers, zip) into PNG and animated GIF you can post on Substack Notes and anywhere else. Runs in your browser — nothing is uploaded." />
+    <meta property="og:title" content="StickStack Converter" />
+    <meta property="og:description" content="WhatsApp stickers → PNG & GIF, right in your browser. Nothing is uploaded." />
+    <meta name="theme-color" content="#ff5a36" />
+    <link rel="icon" href="../extension/icons/icon32.png" />
+    <link rel="stylesheet" href="app.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="logo"><img src="../extension/icons/icon128.png" width="44" height="44" alt="" /><b>StickStack</b></div>
+      <h1>WhatsApp stickers → <span>PNG &amp; GIF</span></h1>
+      <p>Convert your stickers into files you can post on <b>Substack Notes</b> (or anywhere). Animated stickers become GIFs. Everything happens on your device — nothing is uploaded.</p>
+    </header>
+
+    <main>
+      <section id="drop" class="drop" tabindex="0" aria-label="Add stickers">
+        <div class="drop-icon">📥</div>
+        <b>Drop stickers here</b>
+        <span class="muted">.webp · .wastickers · .zip · PNG · GIF — or a whole folder</span>
+        <div class="btns">
+          <button class="primary" id="pick-files">Choose stickers</button>
+          <button id="pick-folder" class="desktop-only">Choose folder</button>
+        </div>
+        <input type="file" id="in-files" multiple accept=".webp,.png,.gif,.jpg,.jpeg,.avif,.zip,.wastickers,image/*,application/zip" hidden />
+        <input type="file" id="in-folder" webkitdirectory multiple hidden />
+      </section>
+
+      <p id="warn" class="warn" hidden></p>
+
+      <section class="opts" aria-label="Options">
+        <label>Size
+          <select id="o-size"><option value="256">256 px</option><option value="384">384 px</option><option value="512" selected>512 px</option><option value="768">768 px</option></select>
+        </label>
+        <label>Margin
+          <select id="o-padding"><option value="0" selected>None</option><option value="0.1">10%</option><option value="0.2">20%</option></select>
+        </label>
+        <label>Background
+          <select id="o-bg"><option value="transparent" selected>Transparent</option><option value="white">White</option><option value="black">Black</option></select>
+        </label>
+        <label>Animated
+          <select id="o-anim"><option value="gif" selected>GIF</option><option value="static">Still PNG</option><option value="webp">Keep WebP</option></select>
+        </label>
+      </section>
+
+      <section id="toolbar" class="toolbar" hidden>
+        <span id="summary"></span>
+        <div class="btns">
+          <button id="share-all" hidden>Share all</button>
+          <button class="primary" id="zip-all">Download all (.zip)</button>
+          <button id="clear" class="ghost">Clear</button>
+        </div>
+      </section>
+
+      <section id="results" class="results" aria-live="polite"></section>
+      <details id="skipped" class="skipped" hidden><summary></summary><ul></ul></details>
+
+      <section class="help">
+        <h2>Where are my WhatsApp stickers?</h2>
+        <div class="cards">
+          <article>
+            <h3>🤖 Android</h3>
+            <p>Tap <b>Choose stickers</b>, open the menu (☰) → your phone’s storage, then go to:</p>
+            <code>Android › media › com.whatsapp › WhatsApp › Media › WhatsApp Stickers</code>
+            <p class="muted">Select all and tap <b>Select</b>. Older phones: <code>WhatsApp › Media › WhatsApp Stickers</code>.</p>
+          </article>
+          <article>
+            <h3>🍏 iPhone</h3>
+            <p>iOS doesn’t let apps read WhatsApp’s stickers. Use a computer: open <b>web.whatsapp.com</b>, and either use the free <b>StickStack Chrome extension</b> (collects them in one go) or right-click each sticker → <b>Save image as…</b>, then drop the files here.</p>
+          </article>
+          <article>
+            <h3>📦 Sticker packs</h3>
+            <p><b>.wastickers</b> files from sticker-maker apps and plain <b>.zip</b> archives work directly — just drop them in.</p>
+            <p class="muted">Telegram animated (.tgs) and video (.webm) stickers aren’t supported yet.</p>
+          </article>
+        </div>
+        <h2>Posting on Substack</h2>
+        <p>In the Substack app or website, start a Note → tap the image button → pick your converted stickers. Notes take up to <b>6 images</b> per note. On a computer, the <b>StickStack extension</b> adds a sticker button right inside Notes and replies.</p>
+      </section>
+    </main>
+
+    <footer>
+      <a id="ext" target="_blank" rel="noopener">Get the Chrome extension</a> ·
+      <a id="repo" target="_blank" rel="noopener">Open source on GitHub</a> ·
+      <a id="coffee" target="_blank" rel="noopener">☕ Buy me a coffee</a>
+      <p class="muted">Not affiliated with Substack, WhatsApp or Meta. Your files never leave your device.</p>
+    </footer>
+  </body>
+</html>
