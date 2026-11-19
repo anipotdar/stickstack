@@ -1,12 +1,12 @@
 {
   "name": "stickstack",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Bring your WhatsApp sticker collection to Substack Notes.",
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "test": "node --test test/unit.test.mjs",
+    "test": "node --test test/unit.test.mjs test/voice.test.mjs",
     "fixtures": "python3 scripts/make_fixtures.py test/fixtures",
     "e2e": "python3 test/browser/run_render.py && python3 test/browser/run_extension.py && python3 test/browser/run_web.py",
     "package": "sh scripts/package.sh",

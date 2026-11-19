@@ -878,5 +878,11 @@
   const ed0 = resolveEditor(deepActive());
   if (ed0) setActive(ed0);
 
-  window.__stickstackSubstack = { alive: () => !dead && runtimeAlive(), destroy, _test: { insert, strategies, findImageInputs, resolveEditor } };
+  // `api` is shared with content/voice.js (same extension, same isolated world).
+  window.__stickstackSubstack = {
+    alive: () => !dead && runtimeAlive(),
+    destroy,
+    api: { send, insert, toast, resolveEditor, deepActive, isDark: () => wrap.classList.contains('dark'), applyTheme },
+    _test: { insert, strategies, findImageInputs, resolveEditor },
+  };
 })();

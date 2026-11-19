@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "StickStack — Stickers for Substack Notes",
+  "name": "StickStack — Stickers & voice notes for Substack",
   "short_name": "StickStack",
-  "version": "1.0.0",
-  "description": "Bring your WhatsApp sticker collection to Substack. Import packs, then drop stickers into Notes and replies. 100% local, open source.",
+  "version": "1.1.0",
+  "description": "Bring your WhatsApp sticker collection to Substack. Drop stickers into Notes and replies, and send voice notes in DMs. 100% local, open source.",
   "minimum_chrome_version": "116",
   "icons": {
     "16": "icons/icon16.png",
@@ -24,12 +24,12 @@
     "type": "module"
   },
   "permissions": ["storage", "unlimitedStorage", "offscreen", "scripting", "activeTab"],
-  "host_permissions": ["https://substack.com/*", "https://*.substack.com/*", "https://web.whatsapp.com/*"],
+  "host_permissions": ["https://substack.com/*", "https://*.substack.com/*", "https://web.whatsapp.com/*", "https://substack-post-media.s3.amazonaws.com/*"],
   "optional_host_permissions": ["https://*/*"],
   "content_scripts": [
     {
       "matches": ["https://substack.com/*", "https://*.substack.com/*"],
-      "js": ["content/substack.js"],
+      "js": ["lib/voicecodec.js", "content/substack.js", "content/voice.js"],
       "run_at": "document_idle"
     },
     {

@@ -1,7 +1,7 @@
 // Central configuration. Fork maintainers: change the URLs below.
 export const CONFIG = {
   name: 'StickStack',
-  version: '1.0.0',
+  version: '1.1.0',
   repoUrl: 'https://github.com/YOUR_GITHUB_USERNAME/stickstack',
   issuesUrl: 'https://github.com/YOUR_GITHUB_USERNAME/stickstack/issues',
   coffeeUrl: 'https://buymeacoffee.com/YOUR_BMC_USERNAME',
