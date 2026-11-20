@@ -57,8 +57,8 @@
   const STYLE = `
   :host{all:initial}
   *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-  .light{--bg:#fff;--fg:#1a1a1a;--mut:#6b6b6b;--line:#e7e2dc;--hov:#f6f1ec;--acc:#ff5a36;--accfg:#fff;--shadow:0 12px 40px rgba(20,10,0,.18),0 2px 8px rgba(20,10,0,.08)}
-  .dark{--bg:#1d1b1a;--fg:#f3efeb;--mut:#a39d97;--line:#34302d;--hov:#2a2725;--acc:#ff7a5a;--accfg:#1a0d08;--shadow:0 12px 40px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.3)}
+  .light{--bg:#fff;--fg:#1a1a1a;--mut:#6b7280;--line:#e1e5ec;--hov:#eef1f6;--acc:#4f63d2;--accfg:#fff;--shadow:0 12px 40px rgba(15, 23, 42,.18),0 2px 8px rgba(15, 23, 42,.08)}
+  .dark{--bg:#171a20;--fg:#e8ebf0;--mut:#9aa1ad;--line:#2a2f38;--hov:#22262e;--acc:#8b9bf5;--accfg:#0c1020;--shadow:0 12px 40px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.3)}
   .fab{position:fixed;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--acc);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12);opacity:.72;transition:opacity .15s,transform .15s;padding:0;z-index:3}
   .fab:hover,.fab:focus-visible,.fab.on{opacity:1;transform:scale(1.06)}
   .fab:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
@@ -90,8 +90,8 @@
   .btn{margin-top:12px;border:0;background:var(--acc);color:var(--accfg);font-weight:600;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px}
   .foot{border-top:1px solid var(--line);padding:7px 10px;color:var(--mut);font-size:11px;display:flex;justify-content:space-between;gap:8px;flex-shrink:0}
   .toasts{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;align-items:center;z-index:5;pointer-events:none}
-  .toast{pointer-events:auto;background:#1d1b1a;color:#f3efeb;padding:10px 14px;border-radius:10px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:min(460px,calc(100vw - 32px));display:flex;gap:12px;align-items:center;line-height:1.4;animation:in .18s ease-out}
-  .toast.err{background:#5c1a10}
+  .toast{pointer-events:auto;background:#171a20;color:#e8ebf0;padding:10px 14px;border-radius:10px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:min(460px,calc(100vw - 32px));display:flex;gap:12px;align-items:center;line-height:1.4;animation:in .18s ease-out}
+  .toast.err{background:#7a2230}
   .toast button{background:transparent;border:1px solid rgba(255,255,255,.35);color:inherit;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;white-space:nowrap}
   @keyframes in{from{opacity:0;transform:translateY(6px)}}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

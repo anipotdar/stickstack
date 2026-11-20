@@ -72,27 +72,27 @@
   const root = host.attachShadow({ mode: SHADOW_MODE });
   root.innerHTML = `<style>
     *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-    .panel{width:340px;max-height:min(560px,calc(100vh - 32px));display:flex;flex-direction:column;background:#fff;color:#1a1a1a;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.25);overflow:hidden;font-size:13px;border:1px solid #e7e2dc}
-    @media (prefers-color-scheme:dark){.panel{background:#1d1b1a;color:#f3efeb;border-color:#34302d}.sub,.foot{color:#a39d97!important}.cell{background:#2a2725!important}input[type=text]{background:#2a2725!important;color:#f3efeb!important;border-color:#34302d!important}}
+    .panel{width:340px;max-height:min(560px,calc(100vh - 32px));display:flex;flex-direction:column;background:#fff;color:#1a1a1a;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.25);overflow:hidden;font-size:13px;border:1px solid #e1e5ec}
+    @media (prefers-color-scheme:dark){.panel{background:#171a20;color:#e8ebf0;border-color:#2a2f38}.sub,.foot{color:#9aa1ad!important}.cell{background:#22262e!important}input[type=text]{background:#22262e!important;color:#e8ebf0!important;border-color:#2a2f38!important}}
     .head{padding:12px 14px 6px;display:flex;align-items:center;gap:8px}
     .head b{flex:1;font-size:14px}
     .x{border:0;background:transparent;color:inherit;font-size:16px;cursor:pointer;opacity:.6}
-    .sub{padding:0 14px 8px;color:#6b6b6b;line-height:1.45}
+    .sub{padding:0 14px 8px;color:#6b7280;line-height:1.45}
     .stat{padding:0 14px 8px;font-weight:600}
     .grid{flex:1;overflow-y:auto;padding:4px 10px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;min-height:80px}
-    .cell{position:relative;aspect-ratio:1;border-radius:10px;background:#f6f1ec;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid transparent}
-    .cell.sel{border-color:#ff5a36}
+    .cell{position:relative;aspect-ratio:1;border-radius:10px;background:#eef1f6;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid transparent}
+    .cell.sel{border-color:#4f63d2}
     .cell img{max-width:88%;max-height:88%;pointer-events:none}
-    .cell .chk{position:absolute;top:4px;right:4px;width:16px;height:16px;border-radius:50%;background:#ff5a36;color:#fff;font-size:11px;display:none;align-items:center;justify-content:center}
+    .cell .chk{position:absolute;top:4px;right:4px;width:16px;height:16px;border-radius:50%;background:#4f63d2;color:#fff;font-size:11px;display:none;align-items:center;justify-content:center}
     .cell.sel .chk{display:flex}
     .cell .b{position:absolute;left:4px;bottom:4px;font-size:9px;font-weight:700;background:rgba(0,0,0,.55);color:#fff;padding:1px 4px;border-radius:4px}
-    .empty{grid-column:1/-1;text-align:center;color:#9a948e;padding:20px 8px;line-height:1.5}
+    .empty{grid-column:1/-1;text-align:center;color:#9aa1ad;padding:20px 8px;line-height:1.5}
     .row{display:flex;gap:6px;padding:8px 14px}
-    input[type=text]{flex:1;height:32px;border:1px solid #e7e2dc;border-radius:8px;padding:0 10px;font-size:13px;background:#fff;color:#1a1a1a}
-    button.main{border:0;background:#ff5a36;color:#fff;font-weight:700;border-radius:8px;padding:0 14px;height:34px;cursor:pointer;font-size:13px}
+    input[type=text]{flex:1;height:32px;border:1px solid #e1e5ec;border-radius:8px;padding:0 10px;font-size:13px;background:#fff;color:#1a1a1a}
+    button.main{border:0;background:#4f63d2;color:#fff;font-weight:700;border-radius:8px;padding:0 14px;height:34px;cursor:pointer;font-size:13px}
     button.main:disabled{opacity:.5;cursor:default}
-    button.ghost{border:1px solid #e7e2dc;background:transparent;color:inherit;border-radius:8px;padding:0 10px;height:30px;cursor:pointer;font-size:12px}
-    .foot{padding:6px 14px 12px;color:#6b6b6b;font-size:11px;line-height:1.4}
+    button.ghost{border:1px solid #e1e5ec;background:transparent;color:inherit;border-radius:8px;padding:0 10px;height:30px;cursor:pointer;font-size:12px}
+    .foot{padding:6px 14px 12px;color:#6b7280;font-size:11px;line-height:1.4}
   </style>
   <div class="panel" role="dialog" aria-label="StickStack sticker collector">
     <div class="head"><b>StickStack · Collect stickers</b><button class="x" title="Close" aria-label="Close">✕</button></div>

@@ -2,10 +2,10 @@
 export const CONFIG = {
   name: 'StickStack',
   version: '1.1.0',
-  repoUrl: 'https://github.com/YOUR_GITHUB_USERNAME/stickstack',
-  issuesUrl: 'https://github.com/YOUR_GITHUB_USERNAME/stickstack/issues',
-  coffeeUrl: 'https://buymeacoffee.com/YOUR_BMC_USERNAME',
-  converterUrl: 'https://YOUR_GITHUB_USERNAME.github.io/stickstack/web/',
+  repoUrl: 'https://github.com/anipotdar/stickstack',
+  issuesUrl: 'https://github.com/anipotdar/stickstack/issues',
+  coffeeUrl: 'https://buymeacoffee.com/whiplash07',
+  converterUrl: 'https://anipotdar.github.io/stickstack/web/',
 };
 
 export const LIMITS = {
