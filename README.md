@@ -22,6 +22,7 @@ Substack Notes accept images, but there's no sticker picker, and your best react
 - **One-click collector for WhatsApp Web.** It works for iPhone users too: open web.whatsapp.com, scroll your sticker tray, and save what StickStack finds.
 - **A proper library.** It has packs, favourites, recently used, search, drag-to-organise, rename, backup and restore.
 - **Private by design.** Everything stays in your browser. There's no account, no server and no analytics.
+- **Voice notes in DMs.** Click the 🎙 button in a Substack message, talk, and attach. Other StickStack users get a player; everyone else sees a waveform card. *(Beta.)*
 - **Free web converter** for phones and other browsers. It turns stickers into PNG and GIF files you can attach from the Substack app.
 
 > Not affiliated with Substack, WhatsApp or Meta.

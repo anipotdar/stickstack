@@ -1,0 +1,109 @@
+<!doctype html>
+<!--
+  Voice-note harness: runs the real content/voice.js against a mock DM composer, with a fake
+  microphone (a tone) and a fake Substack upload. Serve the repo root and open:
+    http://localhost:8080/test/browser/voice-harness.html
+  window.harness exposes the attached file and helpers for automated runs.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Voice harness</title>
+    <style>
+      body { font: 14px system-ui, sans-serif; margin: 24px; max-width: 640px; background: #fff; color: #171a21; }
+      .thread { border: 1px solid #e1e5ec; border-radius: 12px; padding: 12px; min-height: 120px; margin-bottom: 12px; }
+      .msg img { max-width: 360px; display: block; }
+      .composer { position: relative; border: 1px solid #c3cad8; border-radius: 10px; padding: 10px 80px 10px 10px; min-height: 44px; }
+      #log { white-space: pre-wrap; font: 12px ui-monospace, monospace; color: #6b7280; margin-top: 12px; }
+    </style>
+  </head>
+  <body>
+    <h3>Mock Substack DM</h3>
+    <div class="thread" id="thread"></div>
+    <div class="composer" contenteditable="true" data-placeholder="Write a message…" aria-label="Write a message" id="composer"></div>
+    <div id="log"></div>
+
+    <script>
+      const log = (...a) => (document.getElementById('log').textContent += a.join(' ') + '\n');
+      const FAKE_ORIGINAL = 'https://substack-post-media.s3.amazonaws.com/public/images/00000000-0000-0000-0000-000000000000_800x200.png';
+      const uploads = new Map(); // original url → bytes
+
+      // Fake microphone: a warbling tone, so MediaRecorder and the analyser get real audio.
+      navigator.mediaDevices.getUserMedia = async () => {
+        const ac = new AudioContext();
+        const osc = ac.createOscillator();
+        const lfo = ac.createOscillator();
+        const gain = ac.createGain();
+        const lfoGain = ac.createGain();
+        lfo.frequency.value = 3;
+        lfoGain.gain.value = 0.4;
+        gain.gain.value = 0.5;
+        lfo.connect(lfoGain).connect(gain.gain);
+        osc.frequency.value = 330;
+        const dest = ac.createMediaStreamDestination();
+        osc.connect(gain).connect(dest);
+        osc.start();
+        lfo.start();
+        return dest.stream;
+      };
+
+      window.harness = { attached: null, extracted: null, toasts: [] };
+
+      // Stand-in for content/substack.js's shared API.
+      window.__stickstackSubstack = {
+        alive: () => true,
+        api: {
+          async send(msg) {
+            if (msg.type === 'settings:get') return { ok: true, settings: { voiceNotes: true, showButton: true } };
+            if (msg.type === 'voice:fetch') {
+              const bytes = uploads.get(msg.url);
+              const v = bytes && StickStackVoice.extractVoice(bytes);
+              if (!v) return { ok: true, voice: null };
+              let bin = '';
+              for (const b of v.audio) bin += String.fromCharCode(b);
+              return { ok: true, voice: { mime: v.mime, durationMs: v.durationMs, peaks: v.peaks, audio: btoa(bin) } };
+            }
+            throw new Error('unexpected ' + msg.type);
+          },
+          // "Upload": keep the bytes, then show the message the way Substack would (through the CDN).
+          async insert(editor, file) {
+            const bytes = new Uint8Array(await file.arrayBuffer());
+            harness.attached = { name: file.name, type: file.type, size: file.size, bytes };
+            harness.extracted = StickStackVoice.extractVoice(bytes);
+            log('attached', file.name, file.size, 'bytes; voice inside:', !!harness.extracted, harness.extracted && harness.extracted.mime, harness.extracted && harness.extracted.durationMs + 'ms');
+            uploads.set(FAKE_ORIGINAL, bytes);
+            const preview = document.createElement('div');
+            preview.className = 'msg';
+            preview.innerHTML = '<p>Image as non-users see it:</p>';
+            const raw = document.createElement('img');
+            raw.src = URL.createObjectURL(file);
+            raw.id = 'raw-card';
+            preview.appendChild(raw);
+            const sent = document.createElement('div');
+            sent.className = 'msg';
+            sent.innerHTML = '<p>Sent message as StickStack users see it:</p>';
+            const img = document.createElement('img');
+            img.alt = '';
+            img.src = 'https://substackcdn.com/image/fetch/w_728,c_limit,f_auto,q_auto:good/' + encodeURIComponent(FAKE_ORIGINAL);
+            sent.appendChild(img);
+            document.getElementById('thread').append(preview, sent);
+            return { ok: true, method: 'paste' };
+          },
+          toast(text, kind) {
+            harness.toasts.push({ text, kind });
+            log('toast:', kind || 'info', text);
+          },
+          resolveEditor(node) {
+            if (node && node.nodeType !== 1) node = node.parentElement;
+            return node && node.isContentEditable ? node.closest('[contenteditable="true"]') : null;
+          },
+          deepActive: () => document.activeElement,
+          isDark: () => false,
+          applyTheme() {},
+        },
+      };
+    </script>
+    <script src="../../extension/lib/voicecodec.js"></script>
+    <script src="../../extension/content/voice.js"></script>
+  </body>
+</html>

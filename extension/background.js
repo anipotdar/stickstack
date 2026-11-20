@@ -2,7 +2,10 @@
 // and the bridge to the offscreen document that does the heavy image work.
 import * as db from './lib/db.js';
 import { getSettings, renderKey } from './lib/settings.js';
-import { blobToDataURL } from './lib/util.js';
+import { blobToDataURL, bytesToBase64 } from './lib/util.js';
+import './lib/voicecodec.js'; // defines globalThis.StickStackVoice
+
+const Voice = globalThis.StickStackVoice;
 import { renderedToPayload } from './lib/service.js';
 
 const OFFSCREEN_URL = chrome.runtime.getURL('offscreen/offscreen.html');
@@ -160,6 +163,19 @@ const handlers = {
   },
   async 'settings:get'() {
     return { settings: await getSettings() };
+  },
+  // Voice notes: fetch an uploaded image's original bytes (the page can't, because of CORS) and
+  // return the recording inside it, if any. Only Substack's own upload bucket is allowed.
+  async 'voice:fetch'({ url }) {
+    if (!Voice.isAllowedOriginal(url)) throw new Error('Not a Substack upload');
+    const res = await fetch(url, { credentials: 'omit', cache: 'force-cache', redirect: 'error' });
+    if (!res.ok) throw new Error(`Couldn’t load the voice note (${res.status})`);
+    const len = Number(res.headers.get('content-length') || 0);
+    if (len > Voice.MAX_FETCH_BYTES) return { voice: null };
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    if (bytes.length > Voice.MAX_FETCH_BYTES || !Voice.isPng(bytes)) return { voice: null };
+    const v = Voice.extractVoice(bytes);
+    return { voice: v && { mime: v.mime, durationMs: v.durationMs, peaks: v.peaks, audio: bytesToBase64(v.audio) } };
   },
   async 'wa:ingest'({ items, packName }) {
     if (!Array.isArray(items) || !items.length) return { report: { added: [], duplicates: [], skipped: [] } };

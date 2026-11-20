@@ -10,6 +10,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   gifMaxMB: 4, // size budget for animated output
   closeOnInsert: true,
   showButton: true,
+  voiceNotes: true, // mic button in DM composers + inline players for received voice notes
 });
 
 const SIZES = [128, 192, 256, 320, 384, 448, 512, 640, 768];
@@ -29,6 +30,7 @@ export function normalizeSettings(raw) {
   s.gifMaxMB = Math.min(15, Math.max(1, Number(s.gifMaxMB) || DEFAULT_SETTINGS.gifMaxMB));
   s.closeOnInsert = s.closeOnInsert !== false;
   s.showButton = s.showButton !== false;
+  s.voiceNotes = s.voiceNotes !== false;
   return s;
 }
 
