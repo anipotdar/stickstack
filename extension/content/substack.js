@@ -13,6 +13,9 @@
   } catch {}
   document.querySelectorAll('[data-stickstack-host]').forEach((n) => n.remove());
 
+  // 'closed' keeps page scripts out of our UI (they could otherwise read the sticker library).
+  // test/browser/run_extension.py switches this to 'open' in its temporary copy.
+  const SHADOW_MODE = 'closed';
   const MAX_IMAGES = 6;
   const VERIFY_MS = 2600;
   const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
@@ -97,7 +100,7 @@
   const hostEl = document.createElement('div');
   hostEl.setAttribute('data-stickstack-host', '');
   hostEl.style.cssText = 'all:initial;position:fixed;top:0;left:0;width:0;height:0;z-index:2147483646;';
-  const root = hostEl.attachShadow({ mode: 'open' });
+  const root = hostEl.attachShadow({ mode: SHADOW_MODE });
   root.innerHTML = `<style>${STYLE}</style>
     <div class="wrap light">
       <button class="fab" type="button" hidden aria-label="Add a sticker (${SHORTCUT})" title="Stickers (${SHORTCUT})">${ICON}</button>

@@ -104,6 +104,15 @@
       };
     </script>
     <script src="../../extension/lib/voicecodec.js"></script>
-    <script src="../../extension/content/voice.js"></script>
+    <script>
+      // The extension uses closed shadow roots; open them here so the harness can drive the UI.
+      fetch('../../extension/content/voice.js', { cache: 'no-store' })
+        .then((r) => r.text())
+        .then((code) => {
+          const s = document.createElement('script');
+          s.textContent = code.replace("const SHADOW_MODE = 'closed';", "const SHADOW_MODE = 'open';");
+          document.body.appendChild(s);
+        });
+    </script>
   </body>
 </html>

@@ -26,6 +26,9 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   }
 });
 
+// Scripts injected into Substack pages (built-in hosts and user-enabled custom domains).
+const SUBSTACK_SCRIPTS = (chrome.runtime.getManifest().content_scripts || []).find((cs) => cs.js?.includes('content/substack.js'))?.js || ['content/substack.js'];
+
 const customId = (origin) => `custom-${new URL(origin.replace('/*', '/')).hostname.replace(/[^a-z0-9.-]/gi, '')}`;
 const BUILT_IN = new Set(chrome.runtime.getManifest().host_permissions);
 
@@ -36,9 +39,9 @@ chrome.permissions.onAdded.addListener(async ({ origins = [] }) => {
     const id = customId(origin);
     try {
       await chrome.scripting.unregisterContentScripts({ ids: [id] }).catch(() => {});
-      await chrome.scripting.registerContentScripts([{ id, matches: [origin], js: ['content/substack.js'], runAt: 'document_idle', persistAcrossSessions: true }]);
+      await chrome.scripting.registerContentScripts([{ id, matches: [origin], js: SUBSTACK_SCRIPTS, runAt: 'document_idle', persistAcrossSessions: true }]);
       const tabs = await chrome.tabs.query({ url: origin });
-      for (const t of tabs) chrome.scripting.executeScript({ target: { tabId: t.id }, files: ['content/substack.js'] }).catch(() => {});
+      for (const t of tabs) chrome.scripting.executeScript({ target: { tabId: t.id }, files: SUBSTACK_SCRIPTS }).catch(() => {});
     } catch (e) {
       console.warn('[StickStack] could not enable', origin, e);
     }
@@ -136,6 +139,79 @@ async function openLibrary(hash = '') {
   return {};
 }
 
+/** GET a URL without cookies, refusing redirects and anything larger than `max` bytes (even without Content-Length). */
+async function fetchCapped(url, max) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 20000);
+  try {
+    const res = await fetch(url, { credentials: 'omit', cache: 'force-cache', redirect: 'error', referrerPolicy: 'no-referrer', signal: ctrl.signal });
+    if (!res.ok) throw new Error(`Couldn’t load the voice note (${res.status})`);
+    if (Number(res.headers.get('content-length') || 0) > max) return null;
+    const reader = res.body.getReader();
+    const parts = [];
+    let size = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.length;
+      if (size > max) {
+        ctrl.abort();
+        return null;
+      }
+      parts.push(value);
+    }
+    const out = new Uint8Array(size);
+    let o = 0;
+    for (const p of parts) {
+      out.set(p, o);
+      o += p.length;
+    }
+    return out;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// ---------------- who may call what ----------------
+// Messages can only come from this extension, but content scripts run inside web pages, so each
+// handler also checks which page it was called from (defence in depth if a page is compromised).
+const EXT_ORIGIN = new URL(chrome.runtime.getURL('')).origin;
+const senderOrigin = (sender) => {
+  try {
+    return sender.origin || new URL(sender.url).origin;
+  } catch {
+    return '';
+  }
+};
+const fromExtensionPage = (sender) => senderOrigin(sender) === EXT_ORIGIN;
+async function fromSubstackPage(sender) {
+  const origin = senderOrigin(sender);
+  if (!sender.tab || !origin.startsWith('https://')) return false;
+  const host = new URL(origin).hostname;
+  if (host === 'substack.com' || host.endsWith('.substack.com')) return true;
+  return chrome.permissions.contains({ origins: [`${origin}/*`] }).catch(() => false); // user-enabled custom domain
+}
+const fromWhatsAppWeb = (sender) => !!sender.tab && senderOrigin(sender) === 'https://web.whatsapp.com';
+
+const ALLOWED = {
+  'library:list': ['ext', 'substack'],
+  'library:thumbs': ['ext', 'substack'],
+  'sticker:render': ['ext', 'substack'],
+  'sticker:fav': ['ext', 'substack'],
+  'library:open': ['ext', 'substack', 'whatsapp'],
+  'settings:get': ['ext', 'substack', 'whatsapp'],
+  'voice:fetch': ['substack'],
+  'wa:ingest': ['whatsapp'],
+};
+async function senderAllowed(type, sender) {
+  for (const kind of ALLOWED[type] || []) {
+    if (kind === 'ext' && fromExtensionPage(sender)) return true;
+    if (kind === 'whatsapp' && fromWhatsAppWeb(sender)) return true;
+    if (kind === 'substack' && (await fromSubstackPage(sender))) return true;
+  }
+  return false;
+}
+
 const handlers = {
   async 'library:list'() {
     const [stickers, packs, settings] = await Promise.all([db.listStickers(), db.listPacks(), getSettings()]);
@@ -168,12 +244,8 @@ const handlers = {
   // return the recording inside it, if any. Only Substack's own upload bucket is allowed.
   async 'voice:fetch'({ url }) {
     if (!Voice.isAllowedOriginal(url)) throw new Error('Not a Substack upload');
-    const res = await fetch(url, { credentials: 'omit', cache: 'force-cache', redirect: 'error' });
-    if (!res.ok) throw new Error(`Couldn’t load the voice note (${res.status})`);
-    const len = Number(res.headers.get('content-length') || 0);
-    if (len > Voice.MAX_FETCH_BYTES) return { voice: null };
-    const bytes = new Uint8Array(await res.arrayBuffer());
-    if (bytes.length > Voice.MAX_FETCH_BYTES || !Voice.isPng(bytes)) return { voice: null };
+    const bytes = await fetchCapped(url, Voice.MAX_FETCH_BYTES);
+    if (!bytes || !Voice.isPng(bytes)) return { voice: null };
     const v = Voice.extractVoice(bytes);
     return { voice: v && { mime: v.mime, durationMs: v.durationMs, peaks: v.peaks, audio: bytesToBase64(v.audio) } };
   },
@@ -190,8 +262,11 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (sender.id !== chrome.runtime.id) return false;
   const handler = handlers[msg.type];
   if (!handler) return false;
-  Promise.resolve()
-    .then(() => handler(msg, sender))
+  senderAllowed(msg.type, sender)
+    .then((ok) => {
+      if (!ok) throw new Error('Not allowed from this page');
+      return handler(msg, sender);
+    })
     .then(
       (r) => sendResponse({ ok: true, ...(r || {}) }),
       (e) => sendResponse({ ok: false, error: String(e?.userMessage || e?.message || e) })

@@ -4,6 +4,9 @@
 // Activated from the StickStack toolbar popup.
 (() => {
   'use strict';
+  // 'closed' keeps page scripts out of our UI. test/browser/run_extension.py switches this to
+  // 'open' in its temporary copy.
+  const SHADOW_MODE = 'closed';
   const prev = window.__stickstackWA;
   if (prev && prev.alive()) return;
   try {
@@ -66,7 +69,7 @@
   const host = document.createElement('div');
   host.setAttribute('data-stickstack-wa', '');
   host.style.cssText = 'all:initial;position:fixed;right:16px;bottom:16px;z-index:2147483646;';
-  const root = host.attachShadow({ mode: 'open' });
+  const root = host.attachShadow({ mode: SHADOW_MODE });
   root.innerHTML = `<style>
     *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
     .panel{width:340px;max-height:min(560px,calc(100vh - 32px));display:flex;flex-direction:column;background:#fff;color:#1a1a1a;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.25);overflow:hidden;font-size:13px;border:1px solid #e7e2dc}

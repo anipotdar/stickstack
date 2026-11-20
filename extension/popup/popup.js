@@ -92,6 +92,12 @@ async function renderContext(tab) {
     });
     return;
   }
+  // Only offer this on pages that are actually Substack publications, so StickStack is never
+  // switched on for unrelated sites (banking, email…) by mistake.
+  if (!(await looksLikeSubstack(tab.id))) {
+    box.hidden = true;
+    return;
+  }
   box.innerHTML = `<p><b>Substack publication on its own domain?</b><br><span class="muted">Turn on StickStack for <b>${escapeHtml(host)}</b> to use stickers in its comments and notes.</span></p><button id="enable">Enable on this site</button><p class="err" id="eerr" hidden></p>`;
   $('enable').addEventListener('click', async () => {
     try {
@@ -105,6 +111,22 @@ async function renderContext(tab) {
       $('eerr').textContent = String(e?.message || e);
     }
   });
+}
+
+/** Uses the temporary activeTab grant from opening the popup; reads nothing but the page's own tags. */
+async function looksLikeSubstack(tabId) {
+  try {
+    const [r] = await chrome.scripting.executeScript({
+      target: { tabId },
+      func: () =>
+        !!document.querySelector(
+          'link[href^="https://substackcdn.com/"],script[src^="https://substackcdn.com/"],meta[name="generator"][content*="Substack" i],link[rel="alternate"][href*=".substack.com/"]'
+        ),
+    });
+    return r?.result === true;
+  } catch {
+    return false;
+  }
 }
 
 function escapeHtml(s) {
