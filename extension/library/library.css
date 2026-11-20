@@ -1,30 +1,30 @@
 :root {
-  --bg: #fbf6f1;
+  --bg: #f5f7fa;
   --panel: #ffffff;
-  --fg: #1d1a17;
-  --mut: #7a716a;
-  --line: #ebe2d8;
-  --hov: #f4ece4;
-  --acc: #ff5a36;
-  --acc2: #ffb648;
+  --fg: #171a21;
+  --mut: #6b7280;
+  --line: #e1e5ec;
+  --hov: #eef1f6;
+  --acc: #4f63d2;
+  --acc2: #5fb3c9;
   --accfg: #ffffff;
   --danger: #d64545;
-  --tile: #fffdfb;
-  --shadow: 0 1px 2px rgba(60, 30, 10, 0.06), 0 4px 14px rgba(60, 30, 10, 0.06);
+  --tile: #fbfcfe;
+  --shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 4px 14px rgba(15, 23, 42, 0.06);
   color-scheme: light dark;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #161412;
-    --panel: #1f1c1a;
-    --fg: #f3eee9;
-    --mut: #a39a92;
-    --line: #322d29;
-    --hov: #2a2623;
-    --acc: #ff7a5a;
-    --acc2: #ffc46b;
-    --accfg: #1a0d08;
-    --tile: #23201d;
+    --bg: #0f1115;
+    --panel: #171a20;
+    --fg: #e8ebf0;
+    --mut: #9aa1ad;
+    --line: #2a2f38;
+    --hov: #22262e;
+    --acc: #8b9bf5;
+    --acc2: #7fd0e0;
+    --accfg: #0c1020;
+    --tile: #1c1f26;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 14px rgba(0, 0, 0, 0.25);
   }
 }
@@ -492,7 +492,7 @@ main {
   width: min(820px, calc(100vw - 32px));
 }
 .dlg::backdrop {
-  background: rgba(20, 12, 6, 0.45);
+  background: rgba(15, 23, 42, 0.45);
   backdrop-filter: blur(2px);
 }
 .dlg-head {
@@ -705,8 +705,8 @@ main {
   z-index: 100;
 }
 .toast {
-  background: #1d1a17;
-  color: #f3eee9;
+  background: #171a21;
+  color: #e8ebf0;
   padding: 10px 16px;
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
@@ -714,7 +714,7 @@ main {
   animation: tin 0.18s ease-out;
 }
 .toast.err {
-  background: #6b1f14;
+  background: #7a2230;
 }
 @keyframes tin {
   from {

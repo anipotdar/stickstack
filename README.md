@@ -7,9 +7,9 @@ Import your sticker collection once, then drop stickers into Substack Notes and 
 <p align="center">
   <a href="#install">Install</a> ·
   <a href="#get-your-whatsapp-stickers">Get your stickers</a> ·
-  <a href="https://YOUR_GITHUB_USERNAME.github.io/stickstack/web/">Web converter</a> ·
+  <a href="https://anipotdar.github.io/stickstack/web/">Web converter</a> ·
   <a href="#faq">FAQ</a> ·
-  <a href="https://buymeacoffee.com/YOUR_BMC_USERNAME">☕ Buy me a coffee</a>
+  <a href="https://buymeacoffee.com/whiplash07">☕ Buy me a coffee</a>
 </p>
 
 ---
@@ -73,7 +73,7 @@ This works in Chrome, Edge, Brave, Arc, Opera and other Chromium browsers (versi
 
 ## Web converter (no install)
 
-`web/` is a static page using the same engine. Drop stickers in and download PNG and GIF files, or use **Share** on mobile to save them to your camera roll, then attach them in the Substack app. Hosted on GitHub Pages: **https://YOUR_GITHUB_USERNAME.github.io/stickstack/web/**
+`web/` is a static page using the same engine. Drop stickers in and download PNG and GIF files, or use **Share** on mobile to save them to your camera roll, then attach them in the Substack app. Hosted on GitHub Pages: **https://anipotdar.github.io/stickstack/web/**
 
 ## FAQ
 
@@ -131,7 +131,7 @@ Bug reports with your browser version and the Substack page URL are gold. See [C
 
 ## Support
 
-If StickStack made your Notes more fun, you can [buy me a coffee ☕](https://buymeacoffee.com/YOUR_BMC_USERNAME).
+If StickStack made your Notes more fun, you can [buy me a coffee ☕](https://buymeacoffee.com/whiplash07).
 
 ## License
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render StickStack icons (rounded coral tile + peeling white sticker). Usage: python3 scripts/make_icons.py"""
+"""Render StickStack icons (rounded indigo-teal tile + peeling white sticker). Usage: python3 scripts/make_icons.py"""
 from PIL import Image, ImageDraw, ImageFilter
 import os
 S = 1024
@@ -10,7 +10,7 @@ def icon():
     gd = ImageDraw.Draw(grad)
     for y in range(S):
         t = y / S
-        r = int(255); g = int(90 + (150 - 90) * t); b = int(54 + (60 - 54) * t)
+        r = int(79 - 16 * t); g = int(99 + 44 * t); b = int(210 - 34 * t)
         gd.line([(0, y), (S, y)], fill=(r, g, b, 255))
     mask = Image.new("L", (S, S), 0)
     ImageDraw.Draw(mask).rounded_rectangle([24, 24, S - 24, S - 24], radius=230, fill=255)
@@ -25,14 +25,14 @@ def icon():
     d.rounded_rectangle([x0, y0, x1, y1 - fold], radius=70, fill=(255, 255, 255, 255))
     d.rounded_rectangle([x0, y0, x1 - fold, y1], radius=70, fill=(255, 255, 255, 255))
     # peeled corner
-    d.polygon([(x1, y1 - fold), (x1 - fold, y1), (x1 - fold + 18, y1 - fold + 18)], fill=(255, 214, 196, 255))
+    d.polygon([(x1, y1 - fold), (x1 - fold, y1), (x1 - fold + 18, y1 - fold + 18)], fill=(214, 222, 245, 255))
     # face
-    face = (255, 90, 54, 255)
+    face = (79, 99, 210, 255)
     d.ellipse([400, 400, 470, 470], fill=face)
     d.ellipse([560, 400, 630, 470], fill=face)
     d.arc([380, 450, 650, 650], start=20, end=160, fill=face, width=44)
     shadow = Image.new("RGBA", (S, S), (0, 0, 0, 0))
-    shadow.paste((60, 10, 0, 90), (0, 0), st.split()[3])
+    shadow.paste((10, 20, 50, 90), (0, 0), st.split()[3])
     shadow = shadow.filter(ImageFilter.GaussianBlur(22))
     im.alpha_composite(shadow, (0, 18))
     im.alpha_composite(st)

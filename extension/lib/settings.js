@@ -4,7 +4,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   size: 512, // longest side of the exported sticker, px
   padding: 0, // 0 – 0.3, fraction of size added as empty margin
   background: 'transparent', // 'transparent' | 'white' | 'black' | 'custom'
-  customBg: '#fff7f0',
+  customBg: '#f3f6fb',
   animatedFormat: 'gif', // 'gif' | 'webp' (original) | 'static'
   gifMatte: '#ffffff', // colour used to smooth GIF edges (GIF has no partial transparency)
   gifMaxMB: 4, // size budget for animated output
