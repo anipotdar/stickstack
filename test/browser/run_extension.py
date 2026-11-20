@@ -13,7 +13,26 @@ import time
 from playwright.sync_api import sync_playwright
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-EXT = os.environ.get("STICKSTACK_EXT") or os.path.join(ROOT, "extension")
+SRC_EXT = os.environ.get("STICKSTACK_EXT") or os.path.join(ROOT, "extension")
+
+
+def test_copy(src):
+    """Copy the extension with open shadow roots (production uses closed ones) so Playwright can see the UI."""
+    import shutil
+
+    dst = os.path.join(tempfile.mkdtemp(prefix="stickstack-ext-"), "extension")
+    shutil.copytree(src, dst)
+    for rel in ("content/substack.js", "content/voice.js", "content/whatsapp.js"):
+        path = os.path.join(dst, rel)
+        with open(path, encoding="utf-8") as f:
+            code = f.read()
+        assert "const SHADOW_MODE = 'closed';" in code, rel
+        with open(path, "w", encoding="utf-8", newline="") as f:
+            f.write(code.replace("const SHADOW_MODE = 'closed';", "const SHADOW_MODE = 'open';"))
+    return dst
+
+
+EXT = test_copy(SRC_EXT)
 FIX = os.path.join(ROOT, "test", "fixtures")
 CHROME = sys.argv[1] if len(sys.argv) > 1 else "/usr/bin/google-chrome"
 

@@ -9,14 +9,18 @@ const ops = {
     return {};
   },
   async ingest({ items, packName }) {
+    if (!Array.isArray(items) || items.length > 50) throw new Error('Bad batch');
     const inputs = items.map((it, i) => ({ name: String(it.name || `sticker-${i + 1}.webp`), bytes: base64ToBytes(it.b64), source: 'whatsapp-web' }));
     const report = await ingest(inputs, { defaultPackName: packName || 'WhatsApp Web' });
     return { report };
   },
 };
 
-chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-  if (msg?.target !== 'offscreen') return false;
+// Only the service worker talks to this document (it has no tab; pages and content scripts do).
+const fromServiceWorker = (sender) => sender.id === chrome.runtime.id && !sender.tab && (!sender.url || sender.url === chrome.runtime.getURL('background.js'));
+
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg?.target !== 'offscreen' || !fromServiceWorker(sender)) return false;
   const op = ops[msg.op];
   if (!op) return false;
   op(msg).then(
