@@ -24,6 +24,9 @@
   const api = ss?.api;
   if (!V || !api) return;
 
+  // 'closed' keeps page scripts out of our UI (they could otherwise read the sticker library).
+  // test/browser/run_extension.py switches this to 'open' in its temporary copy.
+  const SHADOW_MODE = 'closed';
   let dead = false;
   const alive = () => !dead && ss.alive();
   let settings = { voiceNotes: true, showButton: true };
@@ -89,7 +92,7 @@
   const hostEl = document.createElement('div');
   hostEl.setAttribute('data-stickstack-voice-host', '');
   hostEl.style.cssText = 'all:initial;position:fixed;top:0;left:0;width:0;height:0;z-index:2147483646;';
-  const root = hostEl.attachShadow({ mode: 'open' });
+  const root = hostEl.attachShadow({ mode: SHADOW_MODE });
   root.innerHTML = `<style>${STYLE}</style>
     <div class="wrap light">
       <button class="mic" type="button" hidden aria-label="Record a voice note" title="Voice note">${MIC}</button>
@@ -684,7 +687,7 @@
     const host = document.createElement('span');
     host.setAttribute('data-stickstack-voice-player', '');
     host.style.cssText = 'all:initial;display:block;max-width:100%;margin:2px 0;';
-    const sr = host.attachShadow({ mode: 'open' });
+    const sr = host.attachShadow({ mode: SHADOW_MODE });
     sr.innerHTML = `<style>${PLAYER_STYLE}</style>
       <div class="p ${syncTheme() ? 'dark' : 'light'}" title="Voice note (StickStack)">
         <button class="pp" type="button" aria-label="Play voice note">${PLAY}</button>

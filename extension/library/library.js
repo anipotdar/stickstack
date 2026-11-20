@@ -129,7 +129,16 @@ function renderSide() {
       if (!raw) return;
       e.preventDefault();
       e.stopPropagation();
-      const ids = JSON.parse(raw);
+      // Anything can be dropped here (even from a web page), so only accept known sticker ids.
+      let ids;
+      try {
+        ids = JSON.parse(raw);
+      } catch {
+        return;
+      }
+      const known = new Set(state.stickers.map((s) => s.id));
+      ids = Array.isArray(ids) ? [...new Set(ids)].filter((id) => typeof id === 'string' && known.has(id)) : [];
+      if (!ids.length) return;
       await db.updateStickers(ids, { packId: p.id });
       toast(`Moved ${ids.length} to “${p.name}”`);
       await load();
@@ -138,12 +147,11 @@ function renderSide() {
     nav.appendChild(b);
   }
   // move-to select in selection bar + import target
-  const opts = state.packs.map((p) => `<option value="${p.id}"></option>`).join('');
+  // Built with DOM APIs (never HTML strings) because pack names and ids come from imported files.
   for (const sel of [$('#sel-move'), $('#target-pack')]) {
     const keep = sel.value;
-    const first = sel.options[0].outerHTML;
-    sel.innerHTML = first + opts + (sel.id === 'sel-move' ? '<option value="__new">＋ New pack…</option>' : '<option value="__new">＋ New pack…</option>');
-    state.packs.forEach((p, i) => (sel.options[i + 1].textContent = p.name));
+    const first = sel.options[0];
+    sel.replaceChildren(first, ...state.packs.map((p) => new Option(p.name, p.id)), new Option('＋ New pack…', '__new'));
     sel.value = [...sel.options].some((o) => o.value === keep) ? keep : '';
   }
 }

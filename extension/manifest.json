@@ -23,6 +23,9 @@
     "service_worker": "background.js",
     "type": "module"
   },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; connect-src 'self' https://substack-post-media.s3.amazonaws.com; img-src 'self' blob: data:; media-src 'self' blob:; worker-src 'self'"
+  },
   "permissions": ["storage", "unlimitedStorage", "offscreen", "scripting", "activeTab"],
   "host_permissions": ["https://substack.com/*", "https://*.substack.com/*", "https://web.whatsapp.com/*", "https://substack-post-media.s3.amazonaws.com/*"],
   "optional_host_permissions": ["https://*/*"],

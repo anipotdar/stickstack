@@ -6,6 +6,13 @@
   users get an inline player (play/pause, seek, 1×/1.5×/2×); everyone else sees the card.
 - New setting: "Voice notes" (on by default).
 - Needs access to substack-post-media.s3.amazonaws.com to read received voice notes.
+- Security hardening: strict Content Security Policy for extension pages and the web converter;
+  the background worker checks which page each request comes from; the converter document only
+  accepts the background worker; StickStack's on-page UI uses closed shadow roots so page scripts
+  can't read the sticker library; "Enable on this site" is only offered on Substack publications;
+  voice-note downloads are size-capped and cookie-free; pack menus are built without HTML strings;
+  CI actions pinned to commit SHAs with read-only permissions, plus CodeQL, Dependabot and
+  SECURITY.md.
 
 ## 1.0.0 — 2026-11-17
 First release.

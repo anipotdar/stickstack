@@ -2,6 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <!-- Only this site's own scripts and styles; files never leave the page. GitHub Pages can't send headers, so the policy lives here. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'self' blob: data:; worker-src 'self' blob:; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; upgrade-insecure-requests" />
+    <meta name="referrer" content="no-referrer" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>StickStack Converter — WhatsApp stickers to PNG & GIF</title>
     <meta name="description" content="Free, private converter: turn WhatsApp stickers (.webp, .wastickers, zip) into PNG and animated GIF you can post on Substack Notes and anywhere else. Runs in your browser — nothing is uploaded." />

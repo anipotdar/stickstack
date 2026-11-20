@@ -1,0 +1,8 @@
+# Keeps the pinned GitHub Actions up to date (StickStack has no npm dependencies; the two vendored
+# libraries are listed in extension/lib/vendor/LICENSES.md and updated by hand).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
